@@ -7,9 +7,7 @@ app.use(express.json());
 
 // converting json to js array of objects
 const tours = JSON.parse(
-  fs.readFileSync(
-    `${__dirname}/dev-data/data/tours-simple.json`
-  )
+  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
 const getAllTours = (req, res) => {
@@ -32,9 +30,7 @@ const getTour = (req, res) => {
 
   // if (id > tours.length || id < 0) {
   if (!tour) {
-    return res
-      .status(404)
-      .json({ status: 'fail', massage: 'Invalid Id' });
+    return res.status(404).json({ status: 'fail', massage: 'Invalid Id' });
   }
 
   res.status(200).json({
@@ -72,9 +68,7 @@ const updateTour = (req, res) => {
   const id = req.params.id * 1;
   const tour = tours.find(el => el.id === id);
   if (!tour) {
-    return res
-      .status(404)
-      .json({ status: 'fail', massage: 'Invalid Id' });
+    return res.status(404).json({ status: 'fail', massage: 'Invalid Id' });
   }
   const updatedTour = { ...tour, ...req.body };
   res.status(200).json({
@@ -89,9 +83,7 @@ const deleteTour = (req, res) => {
   const id = req.params.id * 1;
   const tour = tours.find(el => el.id === id);
   if (!tour) {
-    return res
-      .status(404)
-      .json({ status: 'fail', massage: 'Invalid Id' });
+    return res.status(404).json({ status: 'fail', massage: 'Invalid Id' });
   }
   res.status(204).json({
     status: 'success',
@@ -105,10 +97,7 @@ const deleteTour = (req, res) => {
 // app.patch('/api/v1/tours/:id', updateTour);
 // app.delete('/api/v1/tours/:id', deleteTour);
 
-app
-  .route('/api/v1/tours')
-  .get(getAllTours)
-  .post(createTour);
+app.route('/api/v1/tours').get(getAllTours).post(createTour);
 app
   .route('/api/v1/tours/:id')
   .get(getTour)
@@ -116,6 +105,4 @@ app
   .delete(deleteTour);
 
 const port = 3000;
-app.listen(port, () =>
-  console.log(`App running on port ${port}`)
-);
+app.listen(port, () => console.log(`App running on port ${port}`));
