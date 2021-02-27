@@ -5,23 +5,14 @@ const app = express();
 // express.json() is a middleware
 app.use(express.json());
 
-// app.get('/', (req, res) => {
-//   res
-//     .status(200)
-//     // automatically set the content-type header to 'application/json'
-//     .json({ message: 'Hello from the server side!', app: 'Nature' });
-// });
-
-// app.post('/', (req, res) => {
-//   res.send('You can post to this endpoint');
-// });
-
 // converting json to js array of objects
 const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
+  fs.readFileSync(
+    `${__dirname}/dev-data/data/tours-simple.json`
+  )
 );
 
-app.get('/api/v1/tours', (req, res) => {
+const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
     results: tours.length,
@@ -30,18 +21,20 @@ app.get('/api/v1/tours', (req, res) => {
       tours,
     },
   });
-});
+};
 
-app.get('/api/v1/tours/:id', (req, res) => {
+const getTour = (req, res) => {
   console.log(req.params);
 
   // trick to convert string to number
   const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
+  const tour = tours.find(el => el.id === id);
 
   // if (id > tours.length || id < 0) {
   if (!tour) {
-    return res.status(404).json({ status: 'fail', massage: 'Invalid Id' });
+    return res
+      .status(404)
+      .json({ status: 'fail', massage: 'Invalid Id' });
   }
 
   res.status(200).json({
@@ -50,9 +43,9 @@ app.get('/api/v1/tours/:id', (req, res) => {
       tour,
     },
   });
-});
+};
 
-app.post('/api/v1/tours', (req, res) => {
+const createTour = (req, res) => {
   // console.log(req.body);
 
   // const newId = tours[tours.length - 1].id + 1;
@@ -64,7 +57,7 @@ app.post('/api/v1/tours', (req, res) => {
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
-    (err) => {
+    err => {
       res.status(201).json({
         status: 'success',
         data: {
@@ -73,13 +66,15 @@ app.post('/api/v1/tours', (req, res) => {
       });
     }
   );
-});
+};
 
-app.patch('/api/v1/tours/:id', (req, res) => {
+const updateTour = (req, res) => {
   const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
+  const tour = tours.find(el => el.id === id);
   if (!tour) {
-    return res.status(404).json({ status: 'fail', massage: 'Invalid Id' });
+    return res
+      .status(404)
+      .json({ status: 'fail', massage: 'Invalid Id' });
   }
   const updatedTour = { ...tour, ...req.body };
   res.status(200).json({
@@ -88,19 +83,39 @@ app.patch('/api/v1/tours/:id', (req, res) => {
       tour: updatedTour,
     },
   });
-});
+};
 
-app.delete('/api/v1/tours/:id', (req, res) => {
+const deleteTour = (req, res) => {
   const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
+  const tour = tours.find(el => el.id === id);
   if (!tour) {
-    return res.status(404).json({ status: 'fail', massage: 'Invalid Id' });
+    return res
+      .status(404)
+      .json({ status: 'fail', massage: 'Invalid Id' });
   }
   res.status(204).json({
     status: 'success',
     data: null,
   });
-});
+};
+
+// app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours/:id', getTour);
+// app.post('/api/v1/tours', createTour);
+// app.patch('/api/v1/tours/:id', updateTour);
+// app.delete('/api/v1/tours/:id', deleteTour);
+
+app
+  .route('/api/v1/tours')
+  .get(getAllTours)
+  .post(createTour);
+app
+  .route('/api/v1/tours/:id')
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
 
 const port = 3000;
-app.listen(port, () => console.log(`App running on port ${port}`));
+app.listen(port, () =>
+  console.log(`App running on port ${port}`)
+);
